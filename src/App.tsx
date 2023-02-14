@@ -1,39 +1,31 @@
 import React, {useState} from 'react';
-import NewComponent from "./NewComponent";
+import {FullInput} from "./components/FullInput";
 
-export type filterType = 'all' | 'rub' | 'dol'
-
-export type moneyType = {
-    banknots: string
-    value: number
-    number: string
+export type MessagesType = {
+    message: string
 }
 
 const App = () => {
 
-    const [money, setMoney] = useState<moneyType[]>([
-        {banknots: 'Dollars', value: 100, number: ' a1234567890'},
-        {banknots: 'Dollars', value: 50, number: ' z1234567890'},
-        {banknots: 'RUBLS', value: 100, number: ' w1234567890'},
-        {banknots: 'Dollars', value: 100, number: ' e1234567890'},
-        {banknots: 'Dollars', value: 50, number: ' c1234567890'},
-        {banknots: 'RUBLS', value: 100, number: ' r1234567890'},
-        {banknots: 'Dollars', value: 50, number: ' x1234567890'},
-        {banknots: 'RUBLS', value: 50, number: ' v1234567890'},
+    let [messages, setMessages] = useState<MessagesType[]>([
+        {message: 'message1'},
+        {message: 'message2'},
+        {message: 'message3'},
     ])
 
-    let [filter, setFilter] = useState<filterType>('all')
-
-    let filterMoney = [...money]
-    if (filter === 'rub') filterMoney = money.filter(filt => filt.banknots === 'RUBLS')
-    if (filter === 'dol') filterMoney = money.filter(filt => filt.banknots === 'Dollars')
-
-    const filtredBanknots = (curr: filterType) => {
-        setFilter(curr)
+    const addMessages = (title:string) => {
+        setMessages([{message:title}, ...messages])
     }
 
     return (
-        <NewComponent money={filterMoney} filtred={filtredBanknots}/>
+        <div className={'App'}>
+            <FullInput addInput={addMessages}/>
+            {messages.map((el, index) => {
+                return (
+                    <div key={index}>{el.message}</div>
+                )
+            })}
+        </div>
     );
 };
 
