@@ -1,8 +1,6 @@
 import React, {useState} from 'react';
-import {FullInput} from "./components/FullInput";
-import {Input} from "./components/Input";
-import {Button} from "./components/Button";
-import FullInput1 from "./components/FullInput1";
+import Input1 from "./components/Input1";
+import Button1 from "./components/Button1";
 
 export type MessagesType = {
     message: string
@@ -10,19 +8,27 @@ export type MessagesType = {
 
 const App = () => {
 
+    let [title, setTitle] = useState('')
+
     let [messages, setMessages] = useState<MessagesType[]>([
         {message: 'message1'},
         {message: 'message2'},
         {message: 'message3'},
     ])
 
-    const addMessages = (newMessages:string) => {
-        setMessages([{message:newMessages}, ...messages])
+    const addMessages = (newMessage:string) => {
+        setMessages([{message:newMessage}, ...messages])
+    }
+
+    const callBack = () => {
+        addMessages(title)
+        setTitle('')
     }
 
     return (
         <div className={'App'}>
-            <FullInput1 addMessages={addMessages}/>
+            <Input1 title={title} setTitle={setTitle}/>
+            <Button1 callBack={callBack} name='+'/>
             {messages.map((el, index) => {
                 return (
                     <div key={index}>{el.message}</div>
