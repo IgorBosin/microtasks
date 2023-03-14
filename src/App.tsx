@@ -1,41 +1,106 @@
 import React, {useState} from 'react';
-import Input1 from "./components/Input1";
-import Button1 from "./components/Button1";
+import './App.css';
+import {TaskType, Todolist} from './Todolist';
+import {v1} from 'uuid';
 
-export type MessagesType = {
-    message: string
+export type FilterValuesType = "all" | "active" | "completed";
+
+type todolistsType = {
+    id: string
+    title: string
+    filter: FilterValuesType
 }
 
-const App = () => {
+function App() {
 
-    let [title, setTitle] = useState('')
+    // let [tasks, setTasks] = useState([
+    //     {id: v1(), title: "HTML&CSS", isDone: true},
+    //     {id: v1(), title: "JS", isDone: true},
+    //     {id: v1(), title: "ReactJS", isDone: false},
+    //     {id: v1(), title: "Rest API", isDone: false},
+    //     {id: v1(), title: "GraphQL", isDone: false},
+    // ]);
+    // let [filter, setFilter] = useState<FilterValuesType>("all");
 
-    let [messages, setMessages] = useState<MessagesType[]>([
-        {message: 'message1'},
-        {message: 'message2'},
-        {message: 'message3'},
+    let todolistID1 = v1();
+    let todolistID2 = v1();
+
+    let [todolists, setTodolists] = useState<Array<todolistsType>>([
+        {id: todolistID1, title: 'What to learn', filter: 'all'},
+        {id: todolistID2, title: 'What to buy', filter: 'all'},
     ])
 
-    const addMessages = (newMessage:string) => {
-        setMessages([{message:newMessage}, ...messages])
+    let [tasks, setTasks] = useState({
+        [todolistID1]: [
+            {id: v1(), title: "HTML&CSS", isDone: true},
+            {id: v1(), title: "JS", isDone: true},
+            {id: v1(), title: "ReactJS", isDone: false},
+            {id: v1(), title: "Rest API", isDone: false},
+            {id: v1(), title: "GraphQL", isDone: false},
+        ],
+        [todolistID2]: [
+            {id: v1(), title: "HTML&CSS2", isDone: true},
+            {id: v1(), title: "JS2", isDone: true},
+            {id: v1(), title: "ReactJS2", isDone: false},
+            {id: v1(), title: "Rest API2", isDone: false},
+            {id: v1(), title: "GraphQL2", isDone: false},
+        ]
+    });
+
+
+    function removeTask(todoListId: string, id: string) {
+        setTasks({...tasks, [todoListId]: tasks[todoListId].filter(el => el.id !== id)})
     }
 
-    const callBack = () => {
-        addMessages(title)
-        setTitle('')
+    function addTask(todoListId: string, title: string) {
+        let task = {id: v1(), title: title, isDone: false};
+        setTasks({...tasks, [todoListId]: [task, ...tasks[todoListId]]});
     }
+
+    function changeStatus(todoListId: string, taskId: string, isDone: boolean) {
+        setTasks({
+            ...tasks,
+            [todoListId]: tasks[todoListId].map(el => el.id === taskId ? {...el, isDone: isDone} : el)
+        });
+    }
+
+    function changeFilter(todoListId: string, value: FilterValuesType) {
+        setTodolists(todolists.map(el => el.id === todoListId ? {...el, filter: value} : el));
+    }
+
+    const filtredTasksForTodolist = (todoListId: string, filter: FilterValuesType) => {
+        let tasksForTodolist = tasks[todoListId];
+        if (filter === "active") {
+            return tasksForTodolist = tasks[todoListId].filter(t => !t.isDone);
+        }
+        if (filter === "completed") {
+            return tasksForTodolist = tasks[todoListId].filter(t => t.isDone);
+        } else return tasksForTodolist
+    }
+
+
+    const todoListState = todolists.map(el => {
+        const filtredTasks = filtredTasksForTodolist(el.id, el.filter)
+        return (
+            <Todolist
+                key={el.id}
+                title={el.title}
+                todoListId={el.id}
+                tasks={filtredTasks}
+                removeTask={removeTask}
+                changeFilter={changeFilter}
+                addTask={addTask}
+                changeTaskStatus={changeStatus}
+                filter={el.filter}
+            />
+        )
+    })
 
     return (
-        <div className={'App'}>
-            <Input1 title={title} setTitle={setTitle}/>
-            <Button1 callBack={callBack} name='+'/>
-            {messages.map((el, index) => {
-                return (
-                    <div key={index}>{el.message}</div>
-                )
-            })}
+        <div className="App">
+            {todoListState}
         </div>
     );
-};
+}
 
 export default App;
